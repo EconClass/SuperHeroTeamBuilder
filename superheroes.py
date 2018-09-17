@@ -1,20 +1,37 @@
 import random
 
 class Hero:
-    def __init__(self, name):
+    def __init__(self, name, health=100):
         self.name = name
         self.abilities = list()
+        self.armors = list()
+        self.start_health = health
+        self.health = health
+        self.deaths = 0
+        self.kills = 0
 
     def add_ability(self, ability):
-        # Append ability to self.abilities
         self.abilities.append(ability)
 
     def attack(self):
-        # Run attack() on every ability hero has
         hero_attack = 0
         for ablty in self.abilities:
             hero_attack += ablty.attack()
         return hero_attack
+
+    def defend(self):
+        # This method should run the defend method on each piece of armor and calculate the total defense.
+        #
+        # If the hero's health is 0, the hero is out of play and should return 0 defense points.
+
+    def take_damage(self, damage_amt):
+        # This method should subtract the damage amount from the
+        # hero's health.
+        #
+        # If the hero dies update number of deaths.
+
+    def add_kill(self, num_kills):
+        # This method should add the number of kills to self.kills
 
 class Ability:
     def __init__(self, name, attack_strength):
@@ -29,6 +46,15 @@ class Ability:
         # Update attack
         self.attack_strength = attack_strength
 
+class Armor:
+    def __init__(self, name, defense):
+        # Instantiate name and defense strength.
+        self.name = name
+        self.defense = defense
+
+    def defend(self):
+        # Return a random value between 0 and the
+        # initialized defend strength.
 
 class Weapon(Ability): # Weapon inherits Ability Template
     # Overide the .attack() from Ability to new .attack() in Weapon
@@ -37,38 +63,32 @@ class Weapon(Ability): # Weapon inherits Ability Template
 
 class Team:
     def __init__(self, team_name):
-        # Instantiate resources.
         self.name = team_name
         self.heroes = []
 
     def add_hero(self, Hero):
         self.heroes.append(Hero)
 
-    def remove_hero(self, name):
-        """
-        Remove hero from heroes list.
-        If Hero isn't found return 0.
-        """
-        if name in self.heroes:
-            self.heroes.remove(name)
-        else:
-            return 0
-
     def find_hero(self, name):
-        """
-        Find and return hero from heroes list.
-        If Hero isn't found return 0.
-        """
-        if name in self.heroes:
-            hero_index = self.heroes.find(name)
-            print(self.heroes[hero_index])
-        else:
-            return 0
+        index = 0
+        for hero in self.heroes:
+            if hero.name == name:
+                return hero      # Returns object
+        return 0
+
+    def remove_hero(self, name):
+        index = 0
+        for hero in self.heroes:
+            if hero.name == name:
+                self.heroes.pop(index)
+                return
+            index += 1
+        return 0
 
     def view_all_heroes(self):
-        """Print out all heroes to the console."""
+        # Print out all heroes to the console.
         for hero in self.heroes:
-            print(hero)
+            print(hero.name)
 
 if __name__ == "__main__":
     hero = Hero("Wonder Woman")

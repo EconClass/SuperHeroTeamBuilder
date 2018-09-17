@@ -217,4 +217,4 @@ def test_print_heroes():
     output_string = capture_console_output(team.view_all_heroes)
 
     assert "Jodie Foster" in output_string
-assert "Athena" in output_string
+    assert "Athena" in output_string
