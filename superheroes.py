@@ -13,6 +13,9 @@ class Hero:
     def add_ability(self, ability):
         self.abilities.append(ability)
 
+    def add_armor(self, armor):
+        self.armors.append(armor)
+
     def attack(self):
         hero_attack = 0
         for ablty in self.abilities:
@@ -20,18 +23,21 @@ class Hero:
         return hero_attack
 
     def defend(self):
-        # This method should run the defend method on each piece of armor and calculate the total defense.
-        #
-        # If the hero's health is 0, the hero is out of play and should return 0 defense points.
+        hero_defend = 0
+        if self.health is not 0:
+            for armr in self.armors:
+                hero_defend += armr.defend()
+            return hero_defend
+        else: return 0
 
     def take_damage(self, damage_amt):
-        # This method should subtract the damage amount from the
-        # hero's health.
-        #
-        # If the hero dies update number of deaths.
+        self.health -= damage_amt
+        if self.health <= 0:
+            self.deaths += 1
+        else: return self.health
 
     def add_kill(self, num_kills):
-        # This method should add the number of kills to self.kills
+        self.kills += num_kills
 
 class Ability:
     def __init__(self, name, attack_strength):
@@ -48,16 +54,14 @@ class Ability:
 
 class Armor:
     def __init__(self, name, defense):
-        # Instantiate name and defense strength.
         self.name = name
-        self.defense = defense
+        self.defense_strength = defense
 
     def defend(self):
-        # Return a random value between 0 and the
-        # initialized defend strength.
+        return random.randint(0, self.defense_strength)
 
-class Weapon(Ability): # Weapon inherits Ability Template
-    # Overide the .attack() from Ability to new .attack() in Weapon
+
+class Weapon(Ability):
     def attack(self):
         return random.randint(0, self.attack_strength)
 
@@ -90,27 +94,46 @@ class Team:
         for hero in self.heroes:
             print(hero.name)
 
-if __name__ == "__main__":
-    hero = Hero("Wonder Woman")
-    print(hero.attack()) ##
-    ability = Ability("Divine Speed", 300)
-    hero.add_ability(ability)
-    print(hero.attack()) ##
-    new_ability = Ability("Super Human Strength", 800)
-    hero.add_ability(new_ability)
-    print(hero.attack()) ##
-    weapon = Weapon("Lasso of Truth", 500)
-    hero.add_ability(weapon)
-    print(hero.attack()) ##
-    team = Team("Justice League")
-    new_hero = Hero("Batman")
-    B_ability = Ability("Master Martial Artist", 700)
-    new_hero.add_ability(B_ability)
-    print(new_hero.attack()) ##
-    weapon = Weapon("Batarangs", 700)
-    new_hero.add_ability(weapon)
-    print(new_hero.attack()) ##
-    team.add_hero(hero)
-    team.add_hero(new_hero)
-    team.find_hero("Wonder Woman")
-    print(team.view_all_heroes()) ##
+    def attack(self, other_team):
+        total_attack = 0
+        kills = 0
+        for hero in self.heroes:
+            total_attack += hero.attack()
+            kills = other_team.defend(total_attack)
+            hero.add_kill(kills)
+        return
+
+    def defend(self, damage_amt):
+        total_defense = 0
+        for hero in self.heroes:
+            total_defense += hero.defend()
+
+        damage_taken = total_defense - damage_amt
+        if damage_taken > 0:
+            return None
+        else:
+            damage_taken = -damage_taken
+
+        return self.deal_damage(damage_taken)
+
+    def deal_damage(self, damage):
+        div_damage = damage // len(self.heroes)
+        for hero in self.heroes:
+            hero.take_damage(div_damage)
+        return self.update_kills()
+
+    def revive_heroes(self, health=100):
+        for hero in self.heroes:
+            hero.health = hero.start_health
+
+    def stats(self):
+        for hero in self.heroes:
+            kdr = hero.kills / hero.deaths
+            print("{} has a kill to death ratio of {}".format(hero.name, kdr))
+
+    def update_kills(self):
+        dead_heroes = 0
+        for hero in self.heroes:
+            if hero.health <= 0:
+                dead_heroes += 1
+        return dead_heroes
